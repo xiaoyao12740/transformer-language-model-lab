@@ -64,7 +64,7 @@ streamlit run app/streamlit_app.py
 
 ## 测试与 CI
 
-本机实测：17 项 pytest 通过，Ruff 通过。GitHub Actions 在 Python 3.10/3.11/3.12 执行 Ruff、pytest，以及 tiny train → checkpoint 保存/重载 → 短文本生成。CI smoke 只证明工程链未断，不等于正式语言模型实验。
+本机实测：26 项 pytest 通过，Ruff 通过。GitHub Actions 在 Python 3.10/3.11/3.12 执行 Ruff、pytest，以及 tiny train → checkpoint 保存/重载 → 短文本生成。CI smoke 只证明工程链未断，不等于正式语言模型实验。
 
 ## 局限
 
