@@ -21,7 +21,9 @@ def run(model_type, config_path, corpus_path, output_dir, device="cpu"):
     text = Path(corpus_path).read_text(encoding="utf-8")
     sha = hashlib.sha256(text.encode()).hexdigest()
     tokenizer = CharacterTokenizer().fit(text)
-    tokenizer.save(Path(output_dir) / "tokenizer.json")
+    output_path = Path(output_dir)
+    output_path.mkdir(parents=True, exist_ok=True)
+    tokenizer.save(output_path / "tokenizer.json")
     splits = contiguous_split(text)
     block = config["model"]["block_size"]
     datasets = {name: AutoregressiveDataset(tokenizer.encode(value), block) for name, value in splits.items()}

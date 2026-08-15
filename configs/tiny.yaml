@@ -1,5 +1,5 @@
 model:
-  block_size: 16
+  block_size: 8
   embedding_dim: 32
   heads: 4
   layers: 2
@@ -12,4 +12,3 @@ training:
   eval_batches: 2
   gradient_clip: 1.0
   seed: 42
-

@@ -3,5 +3,6 @@ __pycache__/
 .ruff_cache/
 .venv/
 *.egg-info/
+.ci-checkpoints/
 data/formal_corpus.txt
 checkpoints/**/last.pt
