@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import streamlit as st
 import torch
 
+from app.input_validation import PromptValidationError, validate_prompt
 from src.generation.sampling import generate
 from src.training.checkpoint import load_checkpoint
 
@@ -27,15 +28,19 @@ with tabs[0]:
     top_k = st.slider("Top-k", 1, min(50, tokenizer.vocab_size), 20)
     top_p = st.slider("Top-p", 0.1, 1.0, 0.9, 0.05)
     if st.button("Generate"):
-        ids = generate(model, tokenizer.encode(prompt), length, temperature, top_k, top_p, 42)
+        try:
+            _, prompt_ids = validate_prompt(prompt, tokenizer)
+        except PromptValidationError as error:
+            st.error(str(error))
+            st.stop()
+        ids = generate(model, prompt_ids, length, temperature, top_k, top_p, 42)
         st.code(tokenizer.decode(ids))
 with tabs[1]:
     prompt = st.text_input("Context", "To be or not to be", key="next")
-    context = prompt[-model.block_size :]
     try:
-        encoded = tokenizer.encode(context)
-    except ValueError as error:
-        st.error(f"Character outside the 64-character vocabulary / 包含词表外字符：{error}")
+        context, encoded = validate_prompt(prompt, tokenizer, model.block_size)
+    except PromptValidationError as error:
+        st.error(str(error))
         st.stop()
     x = torch.tensor([encoded])
     with torch.no_grad():
@@ -44,11 +49,10 @@ with tabs[1]:
     st.bar_chart({tokenizer.decode([i]): float(v) for v, i in zip(values, indexes)})
 with tabs[2]:
     prompt = st.text_input("Attention context", "To be or not to be", key="attention")
-    context = prompt[-model.block_size :]
     try:
-        encoded = tokenizer.encode(context)
-    except ValueError as error:
-        st.error(f"Character outside the 64-character vocabulary / 包含词表外字符：{error}")
+        context, encoded = validate_prompt(prompt, tokenizer, model.block_size)
+    except PromptValidationError as error:
+        st.error(str(error))
         st.stop()
     x = torch.tensor([encoded])
     with torch.no_grad():
