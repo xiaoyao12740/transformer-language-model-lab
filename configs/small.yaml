@@ -1,0 +1,15 @@
+model:
+  block_size: 96
+  embedding_dim: 96
+  heads: 4
+  layers: 3
+  dropout: 0.1
+training:
+  batch_size: 32
+  learning_rate: 0.001
+  max_steps: 500
+  eval_interval: 50
+  eval_batches: 20
+  gradient_clip: 1.0
+  seed: 42
+

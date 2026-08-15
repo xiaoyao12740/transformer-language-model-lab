@@ -1,0 +1,27 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+      - run: pip install -e ".[dev]"
+      - run: ruff check .
+      - run: pytest -q
+      - name: Tiny train-checkpoint-reload-generate smoke
+        run: |
+          python -m scripts.experiment --model transformer --config configs/tiny.yaml --corpus data/tiny_corpus.txt --output .ci-checkpoints
+          python -m scripts.generate .ci-checkpoints/transformer/best.pt --prompt machine --length 20

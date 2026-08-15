@@ -1,0 +1,9 @@
+{
+  "source_url": "https://raw.githubusercontent.com/karpathy/char-rnn/master/data/tinyshakespeare/input.txt",
+  "work": "The Complete Works of William Shakespeare",
+  "status": "Shakespeare's underlying works are public domain; source transcription attributed by URL",
+  "normalization": "LF line endings; first 600,000 characters",
+  "sha256": "2020ddbb2988648b625422110087228b5cddf29572655b5cc56d3f1543d436f8",
+  "character_count": 600000,
+  "vocabulary_size": 64
+}

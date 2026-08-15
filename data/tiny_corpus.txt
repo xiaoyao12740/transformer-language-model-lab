@@ -1,0 +1,7 @@
+machine learning turns data into patterns.
+deep learning builds models with neural networks.
+attention helps a model focus on useful context.
+transformers predict the future from the past.
+causal masks stop a model from reading future tokens.
+small experiments make difficult ideas easier to understand.
+
