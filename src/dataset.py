@@ -25,3 +25,29 @@ class AutoregressiveDataset(Dataset):
         y = self.tokens[index + 1 : index + self.block_size + 1]
         return x, y
 
+
+class HeldoutNextTokenDataset(Dataset):
+    """Score every selected held-out target once using its preceding context."""
+    def __init__(self, token_ids, block_size, target_positions=None):
+        self.tokens = torch.tensor(token_ids, dtype=torch.long)
+        self.block_size = block_size
+        self.positions = list(target_positions or range(block_size, len(token_ids)))
+        if not self.positions or min(self.positions) < block_size or max(self.positions) >= len(token_ids):
+            raise ValueError("Invalid held-out target positions")
+
+    def __len__(self):
+        return len(self.positions)
+
+    def __getitem__(self, index):
+        position = self.positions[index]
+        return self.tokens[position-self.block_size:position], self.tokens[position]
+
+
+def evenly_spaced_positions(length, block_size, count):
+    available = length - block_size
+    count = min(count, available)
+    if count < 1:
+        raise ValueError("Split is too short")
+    if count == 1:
+        return [block_size]
+    return [block_size + (i * (available - 1)) // (count - 1) for i in range(count)]

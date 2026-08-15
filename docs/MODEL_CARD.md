@@ -6,13 +6,12 @@ Education, architecture inspection, sampling comparison and causal-attention tes
 
 ## Data and model
 
-Character model trained on a 600,000-character public-domain Shakespeare excerpt. Decoder-only Transformer: block 96, width 96, four heads, three layers, 357,280 parameters.
+Character model trained on the complete 1,115,394-character public-domain Shakespeare source. Decoder-only Transformer: block 96, width 96, four heads, three layers, 357,473 parameters.
 
 ## Evaluation
 
-On the held-out contiguous test suffix: CE 2.1271, character perplexity 8.3907, BPC 3.0688 and next-character accuracy 38.01%. These are single-seed character-tokenizer results.
+On 55,675 unique held-out targets: CE 2.1991, character perplexity 9.0173, BPC 3.1727 and next-character accuracy 35.65%. Count Bigram alpha 0.5 reaches CE 2.4904 and PPL 12.0655.
 
 ## Limitations
 
 Narrow historical English domain; no factuality, alignment, toxicity or memorization audit; stochastic generations may be incoherent; no production latency/SLA claim. Character perplexity is not comparable with subword-model perplexity.
-
