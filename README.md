@@ -10,12 +10,12 @@ A from-scratch causal Transformer language-model lab covering character tokeniza
 
 ## Measured results
 
-One CPU formal run, seed 42, on a contiguous 600,000-character public-domain Shakespeare excerpt. Both models use the same tokenizer and train/validation/test boundaries; the test split is evaluated only after selecting the best validation checkpoint.
+One CPU formal run, seed 42, on the complete 1,115,394-character public-domain Shakespeare source. The tokenizer is fit on train only. Selection uses 1,024 evenly-spaced validation targets; full validation and test score every held-out target exactly once.
 
 | Model | Test CE ↓ | Character PPL ↓ | BPC ↓ | Next-char accuracy ↑ | Parameters | Train time |
 |---|---:|---:|---:|---:|---:|---:|
-| Bigram | 3.9272 | 50.7644 | 5.6657 | 6.20% | 4,096 | 0.83 s |
-| Causal Transformer | **2.1271** | **8.3907** | **3.0688** | **38.01%** | 357,280 | 78.03 s |
+| Count Bigram (alpha 0.5) | 2.4904 | 12.0655 | 3.5928 | 27.07% | 4,225 counts | deterministic |
+| Causal Transformer | **2.1991** | **9.0173** | **3.1727** | **35.65%** | 357,473 | 85.33 s |
 
 Character-level perplexity is tokenizer-dependent and must not be compared directly with subword perplexity reported for GPT, LLaMA or other models.
 
@@ -44,9 +44,9 @@ Each decoder block implements Q/K/V projections, scaled dot-product scores, lowe
 
 - Source: [char-rnn tiny Shakespeare transcription](https://github.com/karpathy/char-rnn/tree/master/data/tinyshakespeare)
 - Underlying works: William Shakespeare, public domain
-- Normalization: LF line endings; first 600,000 characters
-- SHA-256: `2020ddbb2988648b625422110087228b5cddf29572655b5cc56d3f1543d436f8`
-- Vocabulary: 64 characters
+- Normalization: LF line endings; complete 1,115,394-character source
+- SHA-256: `86c4e6aa9db7c042ec79f339dcb96d42b0075e16b8fc2e86bf0ca57e2dc565ed`
+- Vocabulary: 65 characters, fit on train only
 - Split: contiguous 90% train / 5% validation / 5% test, **before** sliding windows
 
 This prevents near-identical overlapping windows from crossing split boundaries. `data/tiny_corpus.txt` is an original smoke-test corpus and is not the formal experiment.
@@ -90,4 +90,3 @@ The suite covers tokenizer roundtrip, shift alignment, contiguous splits, causal
 ## Limitations
 
 This is a small character model trained once on CPU and is not a general-purpose LLM. It has no subword tokenizer, broad factual knowledge, instruction tuning, safety alignment or production serving guarantees. A single seed is not mean ± standard deviation, generated Shakespeare-like text may be incoherent, and attention weights are diagnostics rather than explanations of intent.
-

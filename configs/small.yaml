@@ -10,6 +10,6 @@ training:
   max_steps: 500
   eval_interval: 50
   eval_batches: 20
+  validation_targets: 1024
   gradient_clip: 1.0
   seed: 42
-

@@ -8,12 +8,12 @@
 
 ## 实测结果
 
-正式实验为 CPU、seed 42、60 万字符 Shakespeare 公版作品节选。Bigram 与 Transformer 共用 tokenizer 和连续 90/5/5 切分；测试集只在最佳验证 checkpoint 确定后使用。
+正式实验为 CPU、seed 42、完整 1,115,394 字符 Shakespeare 公版来源。Tokenizer 只在 train 拟合；1,024 个固定 validation target 选择 checkpoint，完整 held-out 每个 target 只计一次。
 
 | 模型 | Test CE ↓ | 字符 PPL ↓ | BPC ↓ | 下一字符准确率 ↑ | 参数量 | 训练时间 |
 |---|---:|---:|---:|---:|---:|---:|
-| Bigram | 3.9272 | 50.7644 | 5.6657 | 6.20% | 4,096 | 0.83 秒 |
-| Causal Transformer | **2.1271** | **8.3907** | **3.0688** | **38.01%** | 357,280 | 78.03 秒 |
+| Count Bigram（alpha 0.5） | 2.4904 | 12.0655 | 3.5928 | 27.07% | 4,225 计数 | 确定性 |
+| Causal Transformer | **2.1991** | **9.0173** | **3.1727** | **35.65%** | 357,473 | 85.33 秒 |
 
 字符级 perplexity 依赖 tokenizer，不能与 GPT/LLaMA 等 subword 模型横向比较。
 
@@ -36,9 +36,9 @@
 
 - 来源：[char-rnn tiny Shakespeare transcription](https://github.com/karpathy/char-rnn/tree/master/data/tinyshakespeare)
 - 原作品：William Shakespeare，公版
-- 规范化：LF 换行，截取前 600,000 字符
-- SHA-256：`2020ddbb2988648b625422110087228b5cddf29572655b5cc56d3f1543d436f8`
-- 字符词表：64
+- 规范化：LF 换行，完整 1,115,394 字符来源
+- SHA-256：`86c4e6aa9db7c042ec79f339dcb96d42b0075e16b8fc2e86bf0ca57e2dc565ed`
+- 字符词表：65，只在 train 拟合
 - 先按连续位置切 90%/5%/5%，再各自建滑动窗口，避免相邻重叠窗口跨集合
 
 模型由 token/position embedding、3 个 Pre-LN decoder block、final LayerNorm 和 LM head 构成。每个 block 自行实现 Q/K/V、scaled dot-product、causal mask、多头拼接、残差和 GELU FFN。训练采用 AdamW、mini-batch、梯度裁剪、周期验证和 best/last checkpoint。
@@ -69,4 +69,3 @@ streamlit run app/streamlit_app.py
 ## 局限
 
 这是一次 CPU、单 seed 的小型字符模型，不是通用 LLM；没有 subword tokenizer、广泛知识、指令微调、安全对齐或生产服务 SLA。单 seed 不能报告 mean±std，生成文本可能不连贯，attention heatmap 也不等同于因果解释。
-

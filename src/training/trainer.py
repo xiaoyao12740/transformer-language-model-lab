@@ -36,7 +36,7 @@ def train(model, train_loader, val_loader, tokenizer, config, checkpoint_dir, co
         optimizer.step()
         tokens_seen += y.numel()
         if step == 1 or step % cfg["eval_interval"] == 0 or step == cfg["max_steps"]:
-            val = evaluate(model, val_loader, device, cfg["eval_batches"])
+            val = evaluate(model, val_loader, device)
             row = {"step": step, "train_loss": loss.item(), "val_loss": val["cross_entropy"]}
             history.append(row)
             metadata = {"step": step, "train_loss": loss.item(), "validation_loss": val["cross_entropy"], "seed": cfg["seed"], "corpus_sha256": corpus_sha256}
@@ -46,4 +46,3 @@ def train(model, train_loader, val_loader, tokenizer, config, checkpoint_dir, co
                 save_checkpoint(f"{checkpoint_dir}/best.pt", model, optimizer, tokenizer, metadata)
     elapsed = time.perf_counter() - started
     return history, {"training_time_seconds": elapsed, "tokens_per_second": tokens_seen / elapsed, "best_validation_loss": best}
-

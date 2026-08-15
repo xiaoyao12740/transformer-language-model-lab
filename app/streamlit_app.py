@@ -31,14 +31,26 @@ with tabs[0]:
         st.code(tokenizer.decode(ids))
 with tabs[1]:
     prompt = st.text_input("Context", "To be or not to be", key="next")
-    x = torch.tensor([tokenizer.encode(prompt)[-model.block_size :]])
+    context = prompt[-model.block_size :]
+    try:
+        encoded = tokenizer.encode(context)
+    except ValueError as error:
+        st.error(f"Character outside the 64-character vocabulary / 包含词表外字符：{error}")
+        st.stop()
+    x = torch.tensor([encoded])
     with torch.no_grad():
         probs = torch.softmax(model(x)[0][0, -1], dim=-1)
     values, indexes = torch.topk(probs, 10)
     st.bar_chart({tokenizer.decode([i]): float(v) for v, i in zip(values, indexes)})
 with tabs[2]:
     prompt = st.text_input("Attention context", "To be or not to be", key="attention")
-    x = torch.tensor([tokenizer.encode(prompt)[-model.block_size :]])
+    context = prompt[-model.block_size :]
+    try:
+        encoded = tokenizer.encode(context)
+    except ValueError as error:
+        st.error(f"Character outside the 64-character vocabulary / 包含词表外字符：{error}")
+        st.stop()
+    x = torch.tensor([encoded])
     with torch.no_grad():
         _, _, attention = model(x, return_attention=True)
     layer = st.selectbox("Layer", range(len(attention)))
@@ -46,10 +58,9 @@ with tabs[2]:
     matrix = attention[layer][0, head].numpy()
     fig, ax = plt.subplots(figsize=(8, 6))
     ax.imshow(matrix, cmap="magma")
-    ax.set_xticks(range(len(prompt))); ax.set_xticklabels(list(prompt), fontsize=7)
-    ax.set_yticks(range(len(prompt))); ax.set_yticklabels(list(prompt), fontsize=7)
+    ax.set_xticks(range(len(context))); ax.set_xticklabels(list(context), fontsize=7)
+    ax.set_yticks(range(len(context))); ax.set_yticklabels(list(context), fontsize=7)
     st.pyplot(fig)
 with tabs[3]:
     metrics_path = ROOT / "reports/metrics/formal_metrics.json"
     st.json(json.loads(metrics_path.read_text()) if metrics_path.exists() else payload)
-
